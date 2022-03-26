@@ -12,4 +12,11 @@
       <ProjectReference Include="..\AurSystem.Framework\AurSystem.Framework.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MassTransit" Version="8.0.0" />
+      <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.0" />
+      <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
+    </ItemGroup>
+
 </Project>
