@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <AssemblyName>CustomerService.Api</AssemblyName>
         <RootNamespace>CustomerService.Api</RootNamespace>
+        <UserSecretsId>6ed1a2d6-efa4-41f7-b12e-4c1bcfa61257</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,9 +14,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
       <PackageReference Include="MassTransit" Version="8.0.0" />
       <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.0" />
       <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+      <PackageReference Include="supabase-csharp" Version="0.3.3" />
       <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
     </ItemGroup>
 
