@@ -1,6 +1,6 @@
 namespace AurSystem.Framework.Models.Domain;
 
-public class OrderItems
+public class OrderItem
 {
     public Guid Id { get; set; }
   

@@ -1,3 +1,5 @@
+using OrderService.Api.Services;
+
 namespace OrderService.Api.EndpointDefinitions;
 
 public class OrderEndpoint : AurSystem.Framework.IEndpointDefinition
@@ -5,6 +7,7 @@ public class OrderEndpoint : AurSystem.Framework.IEndpointDefinition
     public void DefineServices(IServiceCollection services)
     {
         //add services for this endpoint
+        services.AddSingleton<IOrderService, Services.OrderService>();
     }
 
     public void DefineEndpoints(WebApplication app)

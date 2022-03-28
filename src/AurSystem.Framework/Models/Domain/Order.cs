@@ -12,7 +12,7 @@ public class Order
     
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
-    public List<OrderItems> LineItems { get;  } = new List<OrderItems>();
+    public List<OrderItem> LineItems { get;  } = new List<OrderItem>();
 
     public DateTime CreatedAt { get; set; }
   
