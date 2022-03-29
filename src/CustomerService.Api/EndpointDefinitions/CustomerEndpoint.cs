@@ -1,6 +1,7 @@
 using AurSystem.Framework.Exceptions;
 using AurSystem.Framework.Models.Domain;
 using AurSystem.Framework.Models.Dto;
+using AutoMapper;
 using CustomerService.Api.Services;
 
 namespace CustomerService.Api.EndpointDefinitions;
@@ -16,20 +17,22 @@ public class CustomerEndpoint : AurSystem.Framework.IEndpointDefinition
     public void DefineEndpoints(WebApplication app)
     {
         // get all
-        app.MapGet("/customers", async (ICustomerService service, CancellationToken cancellationToken) =>
+        app.MapGet("/customers", async (ICustomerService service, IMapper mapper, 
+                CancellationToken cancellationToken) =>
             {
                 var result =await service.GetCustomersAsync(cancellationToken);
-                return Results.Ok(result);
+                return Results.Ok(mapper.Map<IEnumerable<CustomerDto>>(result));
             })
-            .Produces<IEnumerable<Customer>>()
+            .Produces<IEnumerable<CustomerDto>>()
             .WithName("GetCustomers").WithTags("CustomerServiceAPI");
         // get by id
-        app.MapGet("/customers/{id}", async (Guid id, ICustomerService service, CancellationToken cancellationToken) =>
+        app.MapGet("/customers/{id}", async (Guid id, ICustomerService service, IMapper mapper, 
+                CancellationToken cancellationToken) =>
             {
                 var result = await service.GetCustomerByIdAsync(id, cancellationToken);
-                return result is not null ? Results.Ok(result) : Results.NotFound();
+                return result is not null ? Results.Ok(mapper.Map<CustomerDto>(result)) : Results.NotFound();
             })
-            .Produces<Customer>()
+            .Produces<CustomerDto>()
             .ProducesProblem(404)
             .WithName("GetCustomerById").WithTags("CustomerServiceAPI");
         // update customer balance

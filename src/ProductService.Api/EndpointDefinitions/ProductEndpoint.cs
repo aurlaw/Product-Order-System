@@ -1,6 +1,7 @@
 using AurSystem.Framework.Exceptions;
 using AurSystem.Framework.Models.Domain;
 using AurSystem.Framework.Models.Dto;
+using AutoMapper;
 using ProductService.Api.Services;
 
 namespace ProductService.Api.EndpointDefinitions;
@@ -16,20 +17,22 @@ public class ProductEndpoint : AurSystem.Framework.IEndpointDefinition
     public void DefineEndpoints(WebApplication app)
     {
         // get all
-        app.MapGet("/products", async (IProductService service, CancellationToken cancellationToken) =>
+        app.MapGet("/products", async (IProductService service, IMapper mapper, 
+                CancellationToken cancellationToken) =>
             {
                 var result = await service.GetProductsAsync(cancellationToken);
-                return Results.Ok(result);
+                return Results.Ok(mapper.Map<IEnumerable<ProductDto>>(result));
             })
-            .Produces<IEnumerable<Product>>()
+            .Produces<IEnumerable<ProductDto>>()
             .WithName("GetProducts").WithTags("ProductServiceAPI");
         // get by id
-        app.MapGet("/products/{id}", async (Guid id, IProductService service, CancellationToken cancellationToken) =>
+        app.MapGet("/products/{id}", async (Guid id, IProductService service, IMapper mapper, 
+                CancellationToken cancellationToken) =>
             {
                 var result = await service.GetProductByIdAsync(id, cancellationToken);
-                return result is not null ? Results.Ok(result) : Results.NotFound();
+                return result is not null ? Results.Ok(mapper.Map<ProductDto>(result)) : Results.NotFound();
             })
-            .Produces<Product>()
+            .Produces<ProductDto>()
             .ProducesProblem(404)
             .WithName("GetProductById").WithTags("ProductServiceAPI");    
         // update product quantity

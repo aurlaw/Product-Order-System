@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Ardalis.SmartEnum.JsonNet;
+using Ardalis.SmartEnum.SystemTextJson;
 
 namespace AurSystem.Framework.Models.Dto;
 

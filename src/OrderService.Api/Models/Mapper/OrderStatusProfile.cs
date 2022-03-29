@@ -9,6 +9,6 @@ public class OrderStatusProfile : Profile
     public OrderStatusProfile()
     {
         CreateMap<string, OrderStatus>()
-            .ConvertUsing<OrderStatusConverter>();
+            .ConvertUsing(new OrderStatusConverter());
     }
 }
