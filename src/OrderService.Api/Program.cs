@@ -1,6 +1,7 @@
 using AurSystem.Framework;
 using AurSystem.Framework.Models.Options;
 using AurSystem.Framework.Services;
+using AurSystem.Framework.Configuration;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +29,48 @@ app.UseSwaggerUI(c => {
 
 app.UseEndpointDefinitions();
 
-// app.MapGet("/", () => "Hello World!");
-
 app.Run();
+
+
+/*
+
+            // order
+            //services.AddGenericRequestClient();
+            services.AddMassTransit(x =>
+            {              
+                x.ApplyCustomMassTransitConfiguration();
+                x.AddDelayedMessageScheduler();
+                        
+                x.AddConsumers(Assembly.GetExecutingAssembly());
+                x.AddActivities(Assembly.GetExecutingAssembly());
+                x.AddRequestClient<TakeProductTransactionMessage>();
+                //x.SetKebabCaseEndpointNameFormatter();
+                x.AddSagaStateMachine<OrderStateMachine, OrderState>()                
+                    .InMemoryRepository();
+                x.AddSagaStateMachine<OrderCourierStateMachine, OrderTransactionState>()
+                    .InMemoryRepository();
+                    
+                // x.AddConsumersFromNamespaceContaining<CookOnionRingsConsumer>();
+                // x.AddActivitiesFromNamespaceContaining<GrillBurgerActivity>();
+                // x.AddFuturesFromNamespaceContaining<OrderFuture>();
+                // x.AddSagaRepository<FutureState>()
+                //     .EntityFrameworkRepository(r =>
+                //     {
+                //         r.ConcurrencyMode = ConcurrencyMode.Pessimistic;
+                //         r.LockStatementProvider = new SqlServerLockStatementProvider();
+                //
+                //         r.ExistingDbContext<ForkJointSagaDbContext>();
+                //     });
+                    
+                    
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.AutoStart = true;
+                    cfg.ApplyCustomBusConfiguration();
+                    cfg.UseDelayedMessageScheduler();
+                    cfg.ConfigureEndpoints(context);                
+                });
+            })
+            .AddMassTransitHostedService();            
+ */
+ 

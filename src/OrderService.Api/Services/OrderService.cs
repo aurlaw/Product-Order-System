@@ -1,3 +1,5 @@
+using AurSystem.Framework.Exceptions;
+using AurSystem.Framework.Models;
 using AurSystem.Framework.Models.Domain;
 using AurSystem.Framework.Services;
 using AutoMapper;
@@ -21,10 +23,7 @@ public class OrderService : IOrderService
     
     public async Task<Order?> GetOrderByIdAsync(Guid id, CancellationToken token = default)
     {
-        var client = await _supabaseClient.GetClient();
-        var orderData = await client.From<OrderEntity>()
-            .Filter("id", Constants.Operator.Equals, id.ToString())
-            .Single();
+        var orderData = await GetOrderEntityForId(id, token);
         if (orderData is null) return null;
         var order = _mapper.Map<Order>(orderData);
         var orderItems = await GetMappedOrderItemsForOrder(order.Id, token);
@@ -79,7 +78,29 @@ public class OrderService : IOrderService
         newOrder.LineItems.AddRange(newOrderItems);
         return newOrder;
     }
-    
+
+    public async Task UpdateOrderStatus(Guid id, OrderStatus orderStatus, CancellationToken token = default)
+    {
+        var orderData = await GetOrderEntityForId(id, token);
+        if (orderData is  null)
+        {
+            throw new NotFoundException("Order Not Found", $"Order not found for id {id}");
+        }
+
+        orderData.Status = orderStatus.ToString();
+        orderData.ModifiedAt = DateTime.UtcNow;
+        var client = await _supabaseClient.GetClient();
+        await client.From<OrderEntity>().Update(orderData);
+    }
+
+    private async Task<OrderEntity?> GetOrderEntityForId(Guid orderId, CancellationToken token)
+    {
+        var client = await _supabaseClient.GetClient();
+        var orderData = await client.From<OrderEntity>()
+            .Filter("id", Constants.Operator.Equals, orderId.ToString())
+            .Single();
+        return orderData;
+    }
     private async Task<IEnumerable<OrderItemEntity>> GetOrderItemsForOrder(Guid orderId, CancellationToken token)
     {
         var client = await _supabaseClient.GetClient();

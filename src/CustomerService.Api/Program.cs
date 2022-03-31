@@ -1,6 +1,7 @@
 using AurSystem.Framework;
 using AurSystem.Framework.Models.Options;
 using AurSystem.Framework.Services;
+using AurSystem.Framework.Configuration;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,3 +31,25 @@ app.UseSwaggerUI(c => {
 app.UseEndpointDefinitions();
 
 app.Run();
+
+/*
+            //services.AddGenericRequestClient();
+            services.AddMassTransit(x =>
+            {
+                    x.ApplyCustomMassTransitConfiguration();
+
+                    x.AddDelayedMessageScheduler();
+
+                x.AddConsumers(Assembly.GetExecutingAssembly());
+                //x.SetKebabCaseEndpointNameFormatter();
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                        cfg.AutoStart = true;
+                        cfg.ApplyCustomBusConfiguration();
+                        cfg.UseDelayedMessageScheduler();
+                        cfg.ConfigureEndpoints(context);                    
+                });
+            })
+            .AddMassTransitHostedService(); 
+     
+ */
