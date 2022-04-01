@@ -1,6 +1,7 @@
 namespace AurSystem.Framework.Messages;
 
-public interface CustomerResponse
+public interface ProductResponse
 {
     int Result { get; }
+    
 }

@@ -1,4 +1,6 @@
+using AurSystem.Framework.Exceptions;
 using AurSystem.Framework.Messages;
+using CustomerService.Api.Exceptions;
 using CustomerService.Api.Services;
 using MassTransit;
 
@@ -17,42 +19,23 @@ public class ChargeCustomerConsumer : IConsumer<ChargeCustomerMessage>
 
     public async Task Consume(ConsumeContext<ChargeCustomerMessage> context)
     {
-        throw new NotImplementedException();
+        _logger.LogInformation("ChargeCustomerConsumer -> Get customer info for id {CustomerId}", context.Message.CustomerId);
+        var customerData = await _customerService.GetCustomerByIdAsync(context.Message.CustomerId, context.CancellationToken);
+        if (customerData is null)
+        {
+            throw new NotFoundException("Charge Customer Not Found",
+                $"Customer info not found for id: {context.Message.CustomerId}");
+        }
+        // check to ensure we have enough funds, if overdrawn, throw exception
+        _logger.LogInformation("Checking charge {Charge} against customer balance {Balance}", 
+            context.Message.Charge, customerData.Balance);
+        if (context.Message.Charge > customerData.Balance)
+        {
+            throw new OverdrawnException("Charge Customer Overdraft", $"Customer does not have enough funds for order with charge: {context.Message.Charge}");
+        }
+
+        var newBalance = customerData.Balance - context.Message.Charge;
+        await _customerService.UpdateBalanceAsync(context.Message.CustomerId, newBalance, context.CancellationToken);
+        await context.RespondAsync<CustomerResponse>(new {Result = 1});
     }
 }
-
-/*
-    public class TakeProductTransactionConsumer : IConsumer<TakeProductTransactionMessage>
-    {
-        private readonly ILogger<TakeProductTransactionConsumer> logger;
-        private readonly IProductService productService;
-        private readonly IPublishEndpoint publishEndpoint;
-
-        public TakeProductTransactionConsumer(ILogger<TakeProductTransactionConsumer> logger,
-            IProductService productService,
-            IPublishEndpoint publishEndpoint)
-        {
-            this.logger = logger;
-            this.productService = productService;
-            this.publishEndpoint = publishEndpoint;
-        }
-        public async Task Consume(ConsumeContext<TakeProductTransactionMessage> context)
-        {
-            logger.LogInformation($"Take product called ");
-         
-            Dictionary<int, int> productCounts = new Dictionary<int, int>();
-            foreach (var item in context.Message.ProductBaskets)
-            {
-                productCounts.Add(item.ProductId, item.Count);
-            }
-            var products = await productService.TakeProducts(productCounts);
-            await publishEndpoint.Publish<ProductsUpdatedEvent>(new
-            {
-                ProductUpdatedEvents = products.Select(p =>new { ProductId = p.Id,p.Price,p.Count}).ToList()
-            });
-
-            await context.RespondAsync<IRequestResult>(new { Result = 1 });
-        }
-    } *
- * 
- */

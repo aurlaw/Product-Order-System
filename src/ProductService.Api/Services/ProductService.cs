@@ -51,6 +51,19 @@ public class ProductService : IProductService
         await client.From<ProductEntity>().Update(existingModel);
 
     }
+    public async Task BatchUpdateQtyAsync(IList<Product> productList, CancellationToken token = default)
+    {
+        if(!productList.Any())
+            return;
+        var productListEnt = _mapper.Map<List<ProductEntity>>(productList);
+        var client = await _supabaseClient.GetClient();
+        await client.From<ProductEntity>()
+            .Upsert(productListEnt, new QueryOptions
+            {
+                Upsert = false
+            });
+    }
+
     private async Task<ProductEntity?> GetProductEntityByIdAsync(Guid id, CancellationToken token = default)
     {
         var client = await _supabaseClient.GetClient();

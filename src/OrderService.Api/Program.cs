@@ -12,11 +12,15 @@ builder.Services.Configure<SupabaseConfig>(builder.Configuration.GetSection("Sup
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddSingleton<SupabaseClient>();
 
+// mass transit
+
+// swagger config
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Order Service API", Version = "v1" });    
 });
 
+// API endpoints
 builder.Services.AddEndpointDefinitions(typeof(Program));
 
 // configure app
