@@ -14,8 +14,9 @@ public class CompleteOrderActivity : IExecuteActivity<OrderArgument>
         _orderService = orderService;
     }
 
-    public async Task<ExecutionResult> Execute(ExecuteContext<OrderArgument> context)
+    public Task<ExecutionResult> Execute(ExecuteContext<OrderArgument> context)
     {
-        throw new NotImplementedException();
+        _logger.LogInformation("Execute Complete Order: {OrderId}", context.Arguments.OrderId);
+        return Task.FromResult(context.Completed());
     }
 }

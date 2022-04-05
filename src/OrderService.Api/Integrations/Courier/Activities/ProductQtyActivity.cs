@@ -6,25 +6,27 @@ namespace OrderService.Api.Integrations.Courier.Activities;
 public class ProductQtyActivity : IActivity<ProductArgument, ProductLog>
 {
     private readonly ILogger<ProductQtyActivity> _logger;
-    private readonly IEndpointNameFormatter _formatter;
+    private readonly MessageMapper _messageMapper;
 
-    public ProductQtyActivity(ILogger<ProductQtyActivity> logger, IEndpointNameFormatter formatter)
+    public ProductQtyActivity(ILogger<ProductQtyActivity> logger, MessageMapper messageMapper)
     {
         _logger = logger;
-        _formatter = formatter;
+        _messageMapper = messageMapper;
     }
-    public async Task<ExecutionResult> Execute(ExecuteContext<ProductArgument> context)
+    public Task<ExecutionResult> Execute(ExecuteContext<ProductArgument> context)
     {
         //queue or exchange
-        var address = new Uri($"exchange:{_formatter.Message<TakeProductMessage>()}");
+        var address = new Uri($"exchange:{_messageMapper.GetMessageName<TakeProductMessage>()}");
         
-        throw new NotImplementedException();
+        _logger.LogInformation("Execute Product: {Count} {address}", context.Arguments.Lines?.Count, address);
+        return Task.FromResult(context.Completed());
     }
 
-    public async Task<CompensationResult> Compensate(CompensateContext<ProductLog> context)
+    public Task<CompensationResult> Compensate(CompensateContext<ProductLog> context)
     {
         //queue or exchange
-        var address = new Uri($"exchange:{_formatter.Message<ReturnProductMessage>()}");
-        throw new NotImplementedException();
+        var address = new Uri($"exchange:{_messageMapper.GetMessageName<ReturnProductMessage>()}");
+        _logger.LogInformation("Compensate Product: {Elapsed} - {address}", context.Elapsed, address);
+        return Task.FromResult(context.Compensated());
     }
 }

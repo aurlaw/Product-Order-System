@@ -54,91 +54,53 @@ public class OrderEndpoint : AurSystem.Framework.IEndpointDefinition
             .ProducesValidationProblem(StatusCodes.Status400BadRequest)
             .WithName("CreateOrder").WithTags("OrderServiceAPI");
         // submit order
-        app.MapPost("/orders/submit", async (SubmitOrderDto submitOrderDto, IRequestClient<SubmitOrder> Client,
+        app.MapPost("/orders/submit", async (SubmitOrderDto submitOrderDto, IRequestClient<SubmitOrder> client,
                                                                             IMapper mapper, ILogger<Program> logger, CancellationToken cancellationToken) =>
             {
-                logger.LogInformation("Submit order domain from DTO");
-                // var newOrder = OrderFactory.Create(orderDto);
-                // logger.LogInformation("Order domain created with order number: {OrderNumber} - Total Items: {Count} Amount: {Total:C}", 
-                //     newOrder.OrderNumber, newOrder.LineItems.Count, newOrder.Total);
-                //
-                // var createOrder = await service.CreateOrder(newOrder, cancellationToken);
-                // return Results.Ok(mapper.Map<OrderDto>(createOrder));
-                return Results.Ok();
+                logger.LogInformation("Submit order domain from DTO: {OrderId}", submitOrderDto.OrderId);
+                try
+                {
+                    Response response = await client.GetResponse<OrderCompleted, OrderFaulted>(new
+                    {
+                        submitOrderDto.OrderId
+                    }, cancellationToken);
+                    return response switch
+                    {
+                        (_, OrderCompleted completed) => Results.Ok(new
+                        {
+                            completed.OrderId,
+                            completed.Status,
+                            completed.Created,
+                            completed.Completed,
+                            Order = mapper.Map<OrderDto>(completed.Order)
+                        }),
+                        (_, OrderFaulted faulted) => Results.BadRequest(new
+                        {
+                            faulted.OrderId,
+                            faulted.Description,
+                            faulted.Created,
+                            faulted.Faulted
+                        }),
+                        _ => Results.BadRequest()
+                    };
+                }
+                catch (RequestTimeoutException)
+                {
+                    return Results.Accepted(value:new
+                    {
+                        submitOrderDto.OrderId
+                    });
+                }
             })
             .Produces<OrderCompleted>()
             .Produces<OrderFaulted>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status202Accepted)
             .ProducesValidationProblem(StatusCodes.Status409Conflict)
             .WithName("SubmitOrder").WithTags("OrderServiceAPI");
     }
 }
 /*
- 
-         readonly IRequestClient<SubmitOrder> _client;
 
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status202Accepted)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Post(Order order)
-        {
-            try
-            {
-                Response response = await _client.GetResponse<OrderCompleted, OrderFaulted>(new
-                {
-                    order.OrderId,
-                    order.Burgers,
-                    order.Fries,
-                    order.Shakes,
-                    order.FryShakes
-                });
-
-                return response switch
-                {
-                    (_, OrderCompleted completed) => Ok(new
-                    {
-                        completed.OrderId,
-                        completed.Created,
-                        completed.Completed,
-                        LinesCompleted = completed.LinesCompleted.ToDictionary(x => x.Key, x => new
-                        {
-                            x.Value.Created,
-                            x.Value.Completed,
-                            x.Value.Description,
-                        })
-                    }),
-                    (_, OrderFaulted faulted) => BadRequest(new
-                    {
-                        faulted.OrderId,
-                        faulted.Created,
-                        faulted.Faulted,
-                        LinesCompleted = faulted.LinesCompleted.ToDictionary(x => x.Key, x => new
-                        {
-                            x.Value.Created,
-                            x.Value.Completed,
-                            x.Value.Description,
-                        }),
-                        LinesFaulted = faulted.LinesFaulted.ToDictionary(x => x.Key, x => new
-                        {
-                            Faulted = x.Value.Timestamp,
-                            Reason = x.Value.GetExceptionMessages(),
-                        })
-                    }),
-                    _ => BadRequest()
-                };
-            }
-            catch (RequestTimeoutException)
-            {
-                return Accepted(new
-                {
-                    order.OrderId,
-                    Accepted = order.Burgers.Select(x => x.BurgerId).ToArray()
-                });
-            }
-        } 
- 
- 
- 
 Customer: 
     7ebe8773-9419-48be-bd04-e0a6a3634b75
 ProductID:

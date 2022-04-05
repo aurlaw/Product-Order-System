@@ -2,7 +2,14 @@ using AurSystem.Framework;
 using AurSystem.Framework.Models.Options;
 using AurSystem.Framework.Services;
 using AurSystem.Framework.Configuration;
+using AurSystem.Framework.Messages;
+using MassTransit;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi.Models;
+using OrderService.Api;
+using OrderService.Api.Integrations.Courier.Activities;
+using OrderService.Api.Integrations.Futures;
+using OrderService.Api.Integrations.ItineraryPlanners;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +17,31 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddLogging(x => x.AddConsole());
 builder.Services.Configure<SupabaseConfig>(builder.Configuration.GetSection("Supabase"));
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddSingleton<MessageMapper>();
 builder.Services.AddSingleton<SupabaseClient>();
+builder.Services.TryAddScoped<IItineraryPlanner<SubmitOrder>, OrderItineraryPlanner>();
 
 // mass transit
+builder.Services.AddMassTransit(x =>
+{
+    
+    x.ApplyCustomMassTransitConfiguration();
+    x.AddDelayedMessageScheduler();
+    x.AddActivitiesFromNamespaceContaining<OrderActivity>();
+    x.AddFuturesFromNamespaceContaining<OrderFuture>();
+
+    x.AddSagaRepository<FutureState>()
+        .InMemoryRepository();
+    
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.AutoStart = true;
+        cfg.ApplyCustomBusConfiguration();
+        
+        cfg.UseDelayedMessageScheduler();
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 // swagger config
 builder.Services.AddEndpointsApiExplorer();
@@ -37,6 +66,8 @@ app.Run();
 
 
 /*
+
+
 
             // order
             //services.AddGenericRequestClient();

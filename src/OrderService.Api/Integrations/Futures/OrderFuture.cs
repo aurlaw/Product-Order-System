@@ -19,9 +19,9 @@ public class OrderFuture : Future<SubmitOrder, OrderCompleted, OrderFaulted>
                         var order = context.GetVariable<Order>(nameof(OrderCompleted.Order));
                         return new
                         {
-                            OrderId = order.Id,
+                            OrderId = order?.Id,
                             Order = order,
-                            Status = order.Status.ToString()
+                            Status = order?.Status.ToString()
                         };
                     }));
                 x.OnRoutingSlipFaulted(faulted => faulted
