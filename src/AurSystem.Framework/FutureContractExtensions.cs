@@ -20,5 +20,10 @@ public static class FutureContractExtensions
     {
         return faulted.Message.Exceptions != null ? string.Join(Environment.NewLine, faulted.Message.Exceptions.Select(x => x.Message)) : string.Empty;
     }
-    
+
+    public static string GetExceptionMessages(this ExceptionInfo[] exceptionInfo)
+    {
+        return exceptionInfo.Any() ? string.Join(Environment.NewLine, exceptionInfo.Select(x => x.Message)) : string.Empty;
+        
+    }
 }

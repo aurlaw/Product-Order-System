@@ -1,6 +1,8 @@
 using AurSystem.Framework.Exceptions;
 using AurSystem.Framework.Messages;
+using AurSystem.Framework.Models;
 using MassTransit;
+using OrderService.Api.Exceptions;
 using OrderService.Api.Services;
 
 namespace OrderService.Api.Integrations.Courier.Activities;
@@ -22,16 +24,24 @@ public class OrderActivity : IActivity<OrderArgument, OrderLog>
         var order = await _orderService.GetOrderByIdAsync(context.Arguments.OrderId, context.CancellationToken);
         if (order is null)
         {
+            _logger.LogInformation("Order not found");
             throw new NotFoundException("Order Not Found", $"Order not found for ID: {context.Arguments.OrderId}");
         }
         var initialStatus = order.Status;
+        if (initialStatus == OrderStatus.Completed)
+        {
+            _logger.LogInformation("Order is completed");
+            throw new InvalidOrderException("Invalid Order", $"Order is completed for id {context.Arguments.OrderId}");
+        }
+        _logger.LogInformation("Update order status");
+
         // update status
         await _orderService.UpdateOrderStatus(order.Id, context.Arguments.Status, context.CancellationToken);
 
         var orderLog = new
         {
             Order = order,
-            Status = initialStatus
+            Status = OrderStatus.Faulted
         };
         var upOrder = order;
         upOrder.Status = context.Arguments.Status;
@@ -46,6 +56,7 @@ public class OrderActivity : IActivity<OrderArgument, OrderLog>
                 Quantity = line.Qty
             }).ToList()
         };
+        _logger.LogInformation("Set order");
 
         return context.CompletedWithVariables<OrderLog>(orderLog, orderArgs);
     }

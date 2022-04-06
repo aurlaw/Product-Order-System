@@ -13,20 +13,33 @@ public class ProductQtyActivity : IActivity<ProductArgument, ProductLog>
         _logger = logger;
         _messageMapper = messageMapper;
     }
-    public Task<ExecutionResult> Execute(ExecuteContext<ProductArgument> context)
+    public async Task<ExecutionResult> Execute(ExecuteContext<ProductArgument> context)
     {
         //queue or exchange
         var address = new Uri($"exchange:{_messageMapper.GetMessageName<TakeProductMessage>()}");
-        
         _logger.LogInformation("Execute Product: {Count} {address}", context.Arguments.Lines?.Count, address);
-        return Task.FromResult(context.Completed());
+
+        var sendEndpoint = await context.GetSendEndpoint(address);
+        await sendEndpoint.Send<TakeProductMessage>(new { context.Arguments.Lines});
+
+        var productLog = new
+        {
+            context.Arguments.OrderId,
+            context.Arguments.Lines
+        };
+        return context.Completed<ProductLog>(productLog);
+
     }
 
-    public Task<CompensationResult> Compensate(CompensateContext<ProductLog> context)
+    public async Task<CompensationResult> Compensate(CompensateContext<ProductLog> context)
     {
         //queue or exchange
         var address = new Uri($"exchange:{_messageMapper.GetMessageName<ReturnProductMessage>()}");
-        _logger.LogInformation("Compensate Product: {Elapsed} - {address}", context.Elapsed, address);
-        return Task.FromResult(context.Compensated());
+        _logger.LogInformation("Compensate Product: {Count} - {address}", context.Log.Lines?.Count, address);
+        
+        var sendEndpoint = await context.GetSendEndpoint(address);
+        await sendEndpoint.Send<ReturnProductMessage>(new { context.Log.Lines});
+
+        return context.Compensated();
     }
 }

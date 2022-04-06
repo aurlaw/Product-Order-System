@@ -14,9 +14,13 @@ public class CompleteOrderActivity : IExecuteActivity<OrderArgument>
         _orderService = orderService;
     }
 
-    public Task<ExecutionResult> Execute(ExecuteContext<OrderArgument> context)
+    public async Task<ExecutionResult> Execute(ExecuteContext<OrderArgument> context)
     {
         _logger.LogInformation("Execute Complete Order: {OrderId}", context.Arguments.OrderId);
-        return Task.FromResult(context.Completed());
+
+        await _orderService.UpdateOrderStatus(context.Arguments.OrderId, context.Arguments.Status,
+            context.CancellationToken);
+
+        return context.Completed();
     }
 }
