@@ -7,6 +7,7 @@ public interface IOrderService
 {
     Task<Order?> GetOrderByIdAsync(Guid id, CancellationToken token = default);
     Task<IEnumerable<Order>> GetOrdersAsync(CancellationToken token = default);
+    Task<Order?> GetOrderByOrderNumberAsync(string orderNumber, bool getLines = true, CancellationToken token = default);
     Task<Order> CreateOrder(Order order, CancellationToken token = default);
     Task UpdateOrderStatus(Guid id, OrderStatus orderStatus, CancellationToken token = default);
 

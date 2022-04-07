@@ -57,11 +57,16 @@ public class ProductService : IProductService
             return;
         var productListEnt = _mapper.Map<List<ProductEntity>>(productList);
         var client = await _supabaseClient.GetClient();
-        await client.From<ProductEntity>()
-            .Upsert(productListEnt, new QueryOptions
-            {
-                Upsert = false
-            });
+        foreach (var entity in productListEnt)
+        {
+            await client.From<ProductEntity>()
+                .Update(entity);
+        }        
+        // await client.From<ProductEntity>()
+        //     .Upsert(productListEnt, new QueryOptions
+        //     {
+        //         Upsert = false
+        //     });
     }
 
     private async Task<ProductEntity?> GetProductEntityByIdAsync(Guid id, CancellationToken token = default)

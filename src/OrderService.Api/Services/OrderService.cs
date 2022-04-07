@@ -51,6 +51,23 @@ public class OrderService : IOrderService
         return list;
     }
 
+    public async Task<Order?> GetOrderByOrderNumberAsync(string orderNumber, bool getLines = true, CancellationToken token = default)
+    {
+        var client = await _supabaseClient.GetClient();
+        var orderData = await client.From<OrderEntity>()
+            .Filter("order_number", Constants.Operator.Equals, orderNumber)
+            .Single();
+        if (orderData is null) return null;
+        var order = _mapper.Map<Order>(orderData);
+        if (!getLines) return order;
+        var orderItems = await GetMappedOrderItemsForOrder(order.Id, token);
+        var enumerable = orderItems as OrderItem[] ?? orderItems.ToArray();
+        if (enumerable.Any())
+            order.LineItems.AddRange(enumerable);
+        return order;
+        
+    }
+
     public async Task<Order> CreateOrder(Order order, CancellationToken token = default)
     {
         var client = await _supabaseClient.GetClient();

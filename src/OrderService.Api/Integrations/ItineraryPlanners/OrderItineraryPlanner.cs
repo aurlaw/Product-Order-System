@@ -17,7 +17,7 @@ public class OrderItineraryPlanner : IItineraryPlanner<SubmitOrder>
         _orderAddress = new Uri($"exchange:{formatter.ExecuteActivity<OrderActivity, OrderArgument>()}");
         _paymentAddress = new Uri($"exchange:{formatter.ExecuteActivity<PaymentActivity, PaymentArgument>()}");
         _productAddress = new Uri($"exchange:{formatter.ExecuteActivity<ProductQtyActivity, ProductArgument>()}");
-        _completedOrderAddress = new Uri($"exchange:{formatter.ExecuteActivity<CompleteOrderActivity, OrderArgument>()}");
+        _completedOrderAddress = new Uri($"exchange:{formatter.ExecuteActivity<UpdateOrderActivity, UpdateOrderArgument>()}");
     }
     
     public  Task PlanItinerary(BehaviorContext<FutureState, SubmitOrder> value, IItineraryBuilder builder)
@@ -40,9 +40,9 @@ public class OrderItineraryPlanner : IItineraryPlanner<SubmitOrder>
         {
         });
         // order completed activity
-        builder.AddActivity(nameof(CompleteOrderActivity), _completedOrderAddress, new
+        builder.AddActivity(nameof(UpdateOrderActivity), _completedOrderAddress, new
         {
-            Status = OrderStatus.Completed
+            Status = OrderStatus.Ready
         });
 
         return Task.CompletedTask;

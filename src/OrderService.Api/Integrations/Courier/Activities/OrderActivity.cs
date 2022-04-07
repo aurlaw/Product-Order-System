@@ -28,10 +28,10 @@ public class OrderActivity : IActivity<OrderArgument, OrderLog>
             throw new NotFoundException("Order Not Found", $"Order not found for ID: {context.Arguments.OrderId}");
         }
         var initialStatus = order.Status;
-        if (initialStatus == OrderStatus.Completed)
+        if (initialStatus == OrderStatus.Ready || initialStatus == OrderStatus.Completed)
         {
-            _logger.LogInformation("Order is completed");
-            throw new InvalidOrderException("Invalid Order", $"Order is completed for id {context.Arguments.OrderId}");
+            _logger.LogInformation("Order is {initialStatus}", initialStatus);
+            throw new InvalidOrderException("Invalid Order", $"Order has already been processed for id {context.Arguments.OrderId}");
         }
         _logger.LogInformation("Update order status");
 
@@ -43,14 +43,13 @@ public class OrderActivity : IActivity<OrderArgument, OrderLog>
             Order = order,
             Status = OrderStatus.Faulted
         };
-        var upOrder = order;
-        upOrder.Status = context.Arguments.Status;
+        order.Status = context.Arguments.Status;
         var orderArgs = new
         {
-            Order = upOrder,
-            upOrder.CustomerId,
-            Charge = upOrder.Total,
-            Lines = upOrder.LineItems.Select(line => new
+            Order = order,
+            order.CustomerId,
+            Charge = order.Total,
+            Lines = order.LineItems.Select(line => new
             {
                 line.ProductId,
                 Quantity = line.Qty

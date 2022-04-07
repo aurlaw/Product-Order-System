@@ -3,24 +3,26 @@ using OrderService.Api.Services;
 
 namespace OrderService.Api.Integrations.Courier.Activities;
 
-public class CompleteOrderActivity : IExecuteActivity<OrderArgument>
+public class UpdateOrderActivity : IExecuteActivity<UpdateOrderArgument>
 {
-    private readonly ILogger<CompleteOrderActivity> _logger;
+    private readonly ILogger<UpdateOrderActivity> _logger;
     private readonly IOrderService _orderService;
 
-    public CompleteOrderActivity(ILogger<CompleteOrderActivity> logger, IOrderService orderService)
+    public UpdateOrderActivity(ILogger<UpdateOrderActivity> logger, IOrderService orderService)
     {
         _logger = logger;
         _orderService = orderService;
     }
 
-    public async Task<ExecutionResult> Execute(ExecuteContext<OrderArgument> context)
+    public async Task<ExecutionResult> Execute(ExecuteContext<UpdateOrderArgument> context)
     {
         _logger.LogInformation("Execute Complete Order: {OrderId}", context.Arguments.OrderId);
 
         await _orderService.UpdateOrderStatus(context.Arguments.OrderId, context.Arguments.Status,
             context.CancellationToken);
 
-        return context.Completed();
+        var order = context.Arguments.Order;
+        order.Status = context.Arguments.Status;
+        return context.CompletedWithVariables(new {order});
     }
 }

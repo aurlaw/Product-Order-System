@@ -55,7 +55,7 @@ public class OrderEndpoint : AurSystem.Framework.IEndpointDefinition
             .WithName("CreateOrder").WithTags("OrderServiceAPI");
         // submit order
         app.MapPost("/orders/submit", async (SubmitOrderDto submitOrderDto, IRequestClient<SubmitOrder> client,
-                                                                            IMapper mapper, ILogger<Program> logger, CancellationToken cancellationToken) =>
+                IMapper mapper, ILogger<Program> logger, CancellationToken cancellationToken) =>
             {
                 logger.LogInformation("Submit order domain from DTO: {OrderId}", submitOrderDto.OrderId);
                 try
@@ -97,6 +97,29 @@ public class OrderEndpoint : AurSystem.Framework.IEndpointDefinition
             .Produces(StatusCodes.Status202Accepted)
             .ProducesValidationProblem(StatusCodes.Status409Conflict)
             .WithName("SubmitOrder").WithTags("OrderServiceAPI");
+        // complete order
+        app.MapPost("/orders/complete", async (SubmitOrderDto submitOrderDto, IRequestClient<SubmitOrder> client,
+            IMapper mapper, ILogger<Program> logger, CancellationToken cancellationToken) =>
+        {
+            logger.LogInformation("Complete order domain from DTO: {OrderId}", submitOrderDto.OrderId);
+            return Results.Ok();
+        })
+            .Produces<OrderCompleted>()
+            .Produces<OrderFaulted>(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status202Accepted)
+            .ProducesValidationProblem(StatusCodes.Status409Conflict)
+            .WithName("CompleteOrder").WithTags("OrderServiceAPI");
+        // get status
+        app.MapGet("/orders/status/{orderNumber}", async (string orderNumber, IOrderService service, IMapper mapper,
+                CancellationToken cancellationToken) =>
+            {
+                var result = await service.GetOrderByOrderNumberAsync(orderNumber, false, cancellationToken);
+                return result is not null ? Results.Ok(mapper.Map<OrderDto>(result)) : Results.NotFound();
+            })
+            .Produces<OrderDto>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithName("GetOrderStatus").WithTags("OrderServiceAPI");
+        
     }
 }
 /*

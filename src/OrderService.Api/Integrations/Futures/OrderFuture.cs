@@ -40,6 +40,7 @@ public class OrderFuture : Future<SubmitOrder, OrderCompleted, OrderFaulted>
                         _logger.LogInformation("Setting fault: {Length}", err.Length);
                         return new
                         {
+                            context.Saga.Created,
                             context.Saga.Faulted,
                             Exceptions = err,
                             Description = err.GetExceptionMessages()
