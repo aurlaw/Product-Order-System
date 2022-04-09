@@ -3,6 +3,8 @@ Demo system using .NET Minimal API microservices with Mass Transit and Supabase 
 
 - .NET 6
 - Docker
+- RabbitMQ
+- Supabase
 
 Note: This solution/project was created with Jetbrains Rider
 
@@ -16,6 +18,8 @@ dotnet tool install SwashBuckle.AspNetCore.Cli
 ```
 
 ## Running docker services
+
+Used for running RabbitMQ
 
 ```shell
 docker compose up
