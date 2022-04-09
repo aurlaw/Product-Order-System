@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Api", "OrderSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AurSystem.Framework", "AurSystem.Framework\AurSystem.Framework.csproj", "{031F0D00-A8BA-47EF-B764-D9004D5F17B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryService.Api", "InventoryService.Api\InventoryService.Api.csproj", "{EB35995A-7C67-4EDC-972B-0447861D5904}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{031F0D00-A8BA-47EF-B764-D9004D5F17B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{031F0D00-A8BA-47EF-B764-D9004D5F17B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{031F0D00-A8BA-47EF-B764-D9004D5F17B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB35995A-7C67-4EDC-972B-0447861D5904}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB35995A-7C67-4EDC-972B-0447861D5904}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB35995A-7C67-4EDC-972B-0447861D5904}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB35995A-7C67-4EDC-972B-0447861D5904}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

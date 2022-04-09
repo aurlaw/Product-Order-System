@@ -17,6 +17,24 @@ dotnet new tool-manifest
 dotnet tool install SwashBuckle.AspNetCore.Cli
 ```
 
+## Supabase Configuration
+
+For `CustomerService.Api`, `OrderService.Api` and `ProductService.Api`
+
+```shell
+dotnet user-secrets set "Supabase:Url" "SUBABASE URL"
+dotnet user-secrets set "Supabase:Key" "SUBABASE URL"
+```
+
+Postgres Connection
+
+For `InventoryService.Api`
+
+
+```shell
+dotnet user-secrets set "ConnectionStrings:Postgres" "SUBABASE POSTGRES CONNECTION STRING"
+```
+
 ## Running docker services
 
 Used for running RabbitMQ
@@ -33,3 +51,6 @@ https://localhost:7267/swagger/index.html
 
 ### Order Service API: 
 https://localhost:7005/swagger/index.html
+
+### Inventory Service API:
+https://localhost:7282/swagger/index.html
