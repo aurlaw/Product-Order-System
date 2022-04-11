@@ -7,20 +7,19 @@ public class Inventory
     public Guid Id { get; set; }
     public int Quantity { get; set; }
     public long Version { get; set; }
-    public DateTime Created { get; set; } = DateTime.UtcNow;
-    public DateTime Modified { get; set; } = DateTime.UtcNow;
-
+    public DateTimeOffset Timestamp { get; set; }
+    
     public void Apply(AddInventory addInventory)
     {
         Quantity += addInventory.Quantity;
-        Modified = DateTime.UtcNow;
+        Timestamp = addInventory.TimeStamp;
         Version++;
     }
 
     public void Apply(SubtractInventory subtractInventory)
     {
         Quantity -= subtractInventory.Quantity;
-        Modified = DateTime.UtcNow;
+        Timestamp = subtractInventory.TimeStamp;
         Version++;
     }
 }
