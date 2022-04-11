@@ -8,9 +8,9 @@ public class InventoryProfile : Profile
 {
     public InventoryProfile()
     {
-        CreateMap<AddInventory, InventoryDto>()
+        CreateMap<AddInventory, InventoryEventDto>()
             .ReverseMap();
-        CreateMap<SubtractInventory, InventoryDto>()
+        CreateMap<SubtractInventory, InventoryEventDto>()
             .ReverseMap();
     }   
 }
