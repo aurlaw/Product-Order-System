@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // configure builder
 builder.Services.AddLogging(x => x.AddConsole());
+builder.Services.AddAutoMapper(typeof(Program));
 
 // Marten config
 builder.Services.AddMarten(options =>
