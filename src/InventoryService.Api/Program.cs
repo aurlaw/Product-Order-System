@@ -31,7 +31,22 @@ builder.Services.AddMarten(options =>
 });
 
 // mass transit
-//TODO
+builder.Services.AddMassTransit(x =>
+{
+    x.ApplyCustomMassTransitConfiguration();
+    x.AddDelayedMessageScheduler();
+
+    x.AddConsumers(Assembly.GetExecutingAssembly());
+    
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.AutoStart = true;
+        cfg.ApplyCustomBusConfiguration();
+        cfg.UseDelayedMessageScheduler();
+        cfg.ConfigureEndpoints(context);
+    });
+    
+});
 
 // swagger config
 builder.Services.AddEndpointsApiExplorer();

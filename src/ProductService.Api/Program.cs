@@ -5,6 +5,7 @@ using AurSystem.Framework.Services;
 using MassTransit;
 using AurSystem.Framework.Configuration;
 using Microsoft.OpenApi.Models;
+using ProductService.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddLogging(x => x.AddConsole());
 builder.Services.Configure<SupabaseConfig>(builder.Configuration.GetSection("Supabase"));
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddSingleton<MessageMapper>();
 builder.Services.AddSingleton<SupabaseClient>();
 
 // mass transit
