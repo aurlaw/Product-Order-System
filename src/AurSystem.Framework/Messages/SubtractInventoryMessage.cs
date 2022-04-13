@@ -1,6 +1,6 @@
 namespace AurSystem.Framework.Messages;
 
-public interface ReturnInventoryMessage
+public interface SubtractInventoryMessage
 {
     IList<ProductLine> Lines { get; }
 }

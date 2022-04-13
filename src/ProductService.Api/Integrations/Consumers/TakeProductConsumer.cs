@@ -11,11 +11,13 @@ public class TakeProductConsumer : IConsumer<TakeProductMessage>
 {
     private readonly ILogger<TakeProductConsumer> _logger;
     private readonly IProductService _productService;
+    private readonly MessageMapper _messageMapper;
 
-    public TakeProductConsumer(ILogger<TakeProductConsumer> logger, IProductService productService)
+    public TakeProductConsumer(ILogger<TakeProductConsumer> logger, IProductService productService, MessageMapper messageMapper)
     {
         _logger = logger;
         _productService = productService;
+        _messageMapper = messageMapper;
     }
 
     public async Task Consume(ConsumeContext<TakeProductMessage> context)
@@ -49,6 +51,13 @@ public class TakeProductConsumer : IConsumer<TakeProductMessage>
         // update db
         _logger.LogInformation("Take Batch update products - {Count}", updatedProducts.Count);
         await _productService.BatchUpdateQtyAsync(updatedProducts, context.CancellationToken);
+        
+        // record inventory
+        var address = new Uri($"exchange:{_messageMapper.GetMessageName<SubtractInventoryMessage>()}");
+        _logger.LogInformation("Record Inventory at address: {address} ", address);
+        
+        var sendEndpoint = await context.GetSendEndpoint(address);
+        await sendEndpoint.Send<SubtractInventoryMessage>(new {context.Message.Lines});
 
         await context.RespondAsync<ProductResponse>(new {Result = 1});
     }

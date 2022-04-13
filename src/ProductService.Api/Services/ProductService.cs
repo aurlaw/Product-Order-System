@@ -69,6 +69,32 @@ public class ProductService : IProductService
         //     });
     }
 
+    public async Task AddQtyAsync(Guid id, int quantity, CancellationToken token = default)
+    {
+        var existingModel = await GetProductEntityByIdAsync(id, token);
+        if (existingModel is null)
+        {
+            throw new NotFoundException("Product", $"Product not found for id {id}");
+        }
+        existingModel.Qty += quantity;
+        existingModel.ModifiedAt = DateTime.UtcNow;
+        var client = await _supabaseClient.GetClient();
+        await client.From<ProductEntity>().Update(existingModel);
+    }
+
+    public async Task SubtractQtyAsync(Guid id, int quantity, CancellationToken token = default)
+    {
+        var existingModel = await GetProductEntityByIdAsync(id, token);
+        if (existingModel is null)
+        {
+            throw new NotFoundException("Product", $"Product not found for id {id}");
+        }
+        existingModel.Qty -= quantity;
+        existingModel.ModifiedAt = DateTime.UtcNow;
+        var client = await _supabaseClient.GetClient();
+        await client.From<ProductEntity>().Update(existingModel);
+    }
+
     private async Task<ProductEntity?> GetProductEntityByIdAsync(Guid id, CancellationToken token = default)
     {
         var client = await _supabaseClient.GetClient();

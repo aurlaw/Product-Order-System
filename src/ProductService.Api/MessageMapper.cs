@@ -8,7 +8,7 @@ public class MessageMapper : MessageBaseMapper
 {
     public MessageMapper(IEndpointNameFormatter formatter) : base(formatter)
     {
-        _map.Add(typeof(TakeInventoryMessage), "TakeInventory");
-        _map.Add(typeof(ReturnInventoryMessage), "ReturnInventory");
+        _map.Add(typeof(SubtractInventoryMessage), "SubtractInventory");
+        _map.Add(typeof(AddInventoryMessage), "AddInventory");
     }
 }

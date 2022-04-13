@@ -8,5 +8,7 @@ public interface IProductService
     Task<IEnumerable<Product>> GetProductsAsync(CancellationToken token = default);
     Task UpdateQtyAsync(Guid id, int quantity, CancellationToken token = default);
     Task BatchUpdateQtyAsync(IList<Product> productList, CancellationToken token = default);
-    
+    Task AddQtyAsync(Guid id, int quantity, CancellationToken token = default);
+    Task SubtractQtyAsync(Guid id, int quantity, CancellationToken token = default);
+
 }
